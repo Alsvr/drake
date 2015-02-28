@@ -923,10 +923,17 @@ classdef RigidBodyManipulator < Manipulator
       if nargin<3 || isempty(robot), robot=0; end
       linkname = lower(linkname);
       linkname=regexprep(linkname, '[\[\]\\\/\.]+', '_', 'preservecase');
-
       if ischar(robot) 
         robot = strmatch(lower(robot),lower(model.name)); 
       end
+
+      if model.mex_model_ptr ~= 0
+        body_id = findLinkIdmex(model.mex_model_ptr, linkname, robot);
+        if body_id > 0
+          return;
+        end
+      end
+
       items = strfind(lower({model.body.linkname}),linkname);
       ind = find(~cellfun(@isempty,items));
       if (robot~=0), ind = ind(ismember([model.body(ind).robotnum],robot)); end

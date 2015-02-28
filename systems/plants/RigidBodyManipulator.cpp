@@ -2859,7 +2859,7 @@ int RigidBodyManipulator::findLinkId(string linkname, int robot)
   if(num_match != 1)
   {
     cerr<<"couldn't find unique link "<<linkname<<endl;
-    return(EXIT_FAILURE);
+    return(-1);
   }
   else
   {
