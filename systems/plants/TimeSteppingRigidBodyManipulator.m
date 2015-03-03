@@ -617,7 +617,29 @@ classdef TimeSteppingRigidBodyManipulator < DrakeSystem
         if QP_FAILED 
             % then the active set has changed, call pathlcp
             %path_tic = tic;
-            z = pathlcp(M,w,lb,ub);
+            
+           
+            
+            [z, info] = siconosLCPmex(M,w);
+            
+            
+            
+            
+            
+            
+            %path_mzw_neg = any((M*z+w) < 0);
+            %path_z_neg = any(z < 0);
+            %path_resid = z'*(M*z+w) > 1e-6;
+
+            %siconos_mzw_neg = any((M*z_siconos + w) < 0);
+            %siconos_z_neg = any(z_siconos < 0);
+            %siconos_resid = z_siconos'*(M*z_siconos + w) > 1e-6;
+            
+            pathcalls = 0;
+            if(info ~= 0)
+                pathcalls = pathcalls + 1
+                z = pathlcp(M,w,lb,ub);
+            end
   %             path_time = toc(path_tic);
   %             fprintf('Path solve time: %2.5f\n',path_time);
             obj.LCP_cache.data.fastqp_active_set = [];
