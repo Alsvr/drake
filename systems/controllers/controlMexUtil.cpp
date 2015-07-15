@@ -13,7 +13,6 @@ std::vector<SupportStateElement,Eigen::aligned_allocator<SupportStateElement>> p
   }
   int i, j;
   MatrixXd contact_pts;
-  Vector3d contact_pt = Vector3d::Zero();
   int num_pts;
   std::vector<SupportStateElement,Eigen::aligned_allocator<SupportStateElement>> supports;
   const mxArray* pm;
@@ -39,8 +38,7 @@ std::vector<SupportStateElement,Eigen::aligned_allocator<SupportStateElement>> p
     memcpy(contact_pts.data(), mxGetPrSafe(pm), sizeof(double)*mxGetNumberOfElements(pm));
 
     for (j = 0; j < num_pts; j++) {
-      contact_pt.head(3) = contact_pts.col(j);
-      se.contact_pts.push_back(contact_pt);
+      se.contact_pts.push_back(contact_pts.col(j));
     }
     supports.push_back(se);
   }
