@@ -556,7 +556,6 @@ bool parseJoint(RigidBodyManipulator* model, TiXmlElement* node)
   TiXmlElement* origin = node->FirstChildElement("origin");
   if (origin) {
     poseAttributesToTransform(origin, Ttree.matrix());
-    model->bodies[child_index]->Ttree = Ttree.matrix(); // scheduled for deletion
   }
 
   Vector3d axis;
