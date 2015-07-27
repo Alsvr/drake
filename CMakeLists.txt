@@ -4,6 +4,10 @@ if (POLICY CMP0054)
   cmake_policy(SET CMP0054 OLD)  # so variables inside quotes are still evaluated in if() statements
 endif()
 
+if (APPLE)
+  set(CMAKE_MACOSX_RPATH ON)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # set up pods
