@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
   SimulationOptions options = default_simulation_options;
   options.realtime_factor = 1.0;
-  options.initial_step_size = 0.005;
+  options.initial_step_size = argc == 2 ? 1.0 / atof(argv[1]) : 0.005;
 
   simulate(*sys, 0, 50, static_cast<Eigen::Matrix<double,12,1>>(quad->getRandomState<double>()), options);
 }
