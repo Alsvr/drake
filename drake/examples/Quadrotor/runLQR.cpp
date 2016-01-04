@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
   for (int i=0; i<5; i++) {
     Eigen::Matrix<double,12,1> x0 = xG;
     x0 += static_cast<Eigen::Matrix<double,12,1> >(quad->getRandomState<double>());
-    simulate(*sys,0,10,x0,options);
+    simulate<ode45>(*sys,0,10,x0,options);
   }
 
   // todo: change this back to runLCM instead of just simulate

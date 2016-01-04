@@ -47,14 +47,15 @@ namespace Drake {
     xdot = sys.template dynamics<double>(t, x, u);
   }
 
-  template <typename Derived, template<typename> class StateVector, template<typename> class InputVector, template<typename> class OutputVector, bool isTimeVarying, bool isDirectFeedthrough>
+  template <template<typename> class stepper_type, typename Derived, template<typename> class StateVector, template<typename> class InputVector, template<typename> class OutputVector, bool isTimeVarying, bool isDirectFeedthrough>
   void simulate(const System<Derived,StateVector,InputVector,OutputVector,isTimeVarying,isDirectFeedthrough>& sys, double t0, double tf, const Eigen::VectorXd& x0, const SimulationOptions& options) {
     double t = t0, dt;
     
     using namespace std::placeholders;
-    ode45<Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>> stepper;
+    stepper_type<Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>> stepper;
 
     TimePoint start = TimeClock::now();
+
     Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1> x = x0;
     Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1> xdot;
     Eigen::Matrix<double,InputVector<double>::RowsAtCompileTime,1> u(sys.num_states); u.setConstant(0);
@@ -62,9 +63,10 @@ namespace Drake {
     
     auto ode_system = std::bind(
       system_function<
-      System<Derived,StateVector,InputVector,OutputVector,isTimeVarying,isDirectFeedthrough>, 
-      Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>,
-      Eigen::Matrix<double,InputVector<double>::RowsAtCompileTime,1> >, sys, _1, _2, _3);
+        System<Derived,StateVector,InputVector,OutputVector,isTimeVarying,isDirectFeedthrough>, 
+        Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>,
+        Eigen::Matrix<double,InputVector<double>::RowsAtCompileTime,1>>, 
+        sys, _1, _2, _3);
 
     while (t<tf) {
       handle_realtime_factor(start, t, options.realtime_factor);
