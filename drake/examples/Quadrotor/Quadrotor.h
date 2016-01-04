@@ -61,6 +61,7 @@ public:
   enum {
     RowsAtCompileTime = 12
   };
+  
   std::size_t size() { return 12; }
 
   ScalarType x, y, z, roll, pitch, yaw, xdot, ydot, zdot, rolldot, pitchdot, yawdot;

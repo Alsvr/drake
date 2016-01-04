@@ -3,9 +3,15 @@
 
 #include <thread>
 #include <chrono>
+#include <boost/numeric/odeint.hpp>
+#include <boost/numeric/odeint/external/eigen/eigen.hpp>
 
 namespace Drake {
 
+  template<typename state_type> using ode45 = boost::numeric::odeint::runge_kutta4<state_type>;
+  template<typename state_type> using ode1 = boost::numeric::odeint::euler<state_type>;
+  template<typename state_type> using odeRKD = boost::numeric::odeint::runge_kutta_dopri5<state_type>;
+  
   // simulation options
   struct SimulationOptions {
     double realtime_factor;  // 1 means try to run at realtime speed, < 0 is run as fast as possible
@@ -35,23 +41,36 @@ namespace Drake {
     }
   }
 
+  template <typename SysType, typename StateType, typename InputType>
+  void system_function(SysType const& sys, StateType const& x, StateType &xdot, double t) {
+    InputType u(sys.num_states); u.setConstant(0);    
+    xdot = sys.template dynamics<double>(t, x, u);
+  }
+
   template <typename Derived, template<typename> class StateVector, template<typename> class InputVector, template<typename> class OutputVector, bool isTimeVarying, bool isDirectFeedthrough>
   void simulate(const System<Derived,StateVector,InputVector,OutputVector,isTimeVarying,isDirectFeedthrough>& sys, double t0, double tf, const Eigen::VectorXd& x0, const SimulationOptions& options) {
     double t = t0, dt;
-//    std::cout << "x0 = " << x0.transpose() << std::endl;
+    
+    using namespace std::placeholders;
+    ode45<Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>> stepper;
+
     TimePoint start = TimeClock::now();
     Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1> x = x0;
     Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1> xdot;
     Eigen::Matrix<double,InputVector<double>::RowsAtCompileTime,1> u(sys.num_states); u.setConstant(0);
     Eigen::Matrix<double,OutputVector<double>::RowsAtCompileTime,1> y;
+    
+    auto ode_system = std::bind(
+      system_function<
+      System<Derived,StateVector,InputVector,OutputVector,isTimeVarying,isDirectFeedthrough>, 
+      Eigen::Matrix<double,StateVector<double>::RowsAtCompileTime,1>,
+      Eigen::Matrix<double,InputVector<double>::RowsAtCompileTime,1> >, sys, _1, _2, _3);
+
     while (t<tf) {
       handle_realtime_factor(start, t, options.realtime_factor);
-
-//      std::cout << "t=" << t << ", x = " << x.transpose() << std::endl;
       dt = (std::min)(options.initial_step_size,tf-t);
       y = sys.template output<double>(t,x,u);
-      xdot = sys.template dynamics<double>(t,x,u);
-      x += dt * xdot;
+      stepper.do_step(ode_system, x, t, dt);
       t += dt;
     }
   }
