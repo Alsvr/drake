@@ -6,7 +6,7 @@ add_subdirectory(@VanDerPolCpp)
 
 find_package(Boost)
 if(Boost_FOUND) 
-  include_directories(Boost_INCLUDE_DIRS)
+  include_directories(${Boost_INCLUDE_DIRS})
   add_subdirectory(Pendulum)
   add_subdirectory(Quadrotor)
 endif()

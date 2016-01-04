@@ -5,8 +5,6 @@ include_directories(${PROJECT_SOURCE_DIR}/systems/frames)
 include_directories(${PROJECT_SOURCE_DIR}/systems/plants)
 include_directories(${PROJECT_SOURCE_DIR}/systems/plants/joints)
 include_directories(${PROJECT_SOURCE_DIR}/util)
-include_directories(${PROJECT_SOURCE_DIR}/solvers)
-
 
 if (LCM_FOUND AND NOT WIN32)  # win32 won't be hard... just have to add declspecs
   include_directories(${PROJECT_SOURCE_DIR}/pod-build/lcmgen)
