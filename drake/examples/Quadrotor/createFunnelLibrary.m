@@ -1,7 +1,7 @@
 function funLib = createFunnelLibrary()
 % NOTEST
     r = Quadrotor();
-
+    
     if(~exist('trajectoryLibrary.mat'))
         %generate trajectory library
         disp('building trajectory library...')
@@ -50,6 +50,8 @@ function funLib = createFunnelLibrary()
     Qf = diag([100*ones(6,1);ones(6,1)]);
     trajLib = trajLib.stabilizeTrajectories(r, Q, R, Qf);
     funLib = FunnelLibrary(trajLib);
+    
+    r = r.setInputLimits(-Inf(4,1), Inf(4,1))
     funLib = funLib.computeFunnels(r, 115, 12, 0.15);
 
     funLib.plotFunnels(r);
