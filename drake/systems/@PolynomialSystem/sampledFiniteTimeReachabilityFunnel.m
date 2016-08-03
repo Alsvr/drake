@@ -29,6 +29,10 @@ function [V,rho,Phi] = sampledFiniteTimeReachabilityFunnel(sys,polyOrig,Vtraj0,G
 % @option Lup Multiplier degree
 % @option Lum Multiplier degree
 
+
+%both solvers are needed due to numerical instabilities in the
+%SDPs generated during the funnel computation
+%this should be revisited as the solvers improve
 checkDependency('mosek');
 checkDependency('sedumi');
 
@@ -306,8 +310,6 @@ function L1f = findL(Vtraj0,Vy,rho,rhodot,utraj,ts,forig_u,Phi,options,u,ui,x)
 
     N = length(ts)-1;
     disp('Step 1: Searching for multipliers and controller...')
-
-    if (matlabpool('size')==0) matlabpool 4; end
 
     % Optimized multipliers
     L1f = cell(1,N);
